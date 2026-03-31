@@ -1,0 +1,43 @@
+# ================================
+# Local AI Agent Project
+# ================================
+# Install all dependencies with:
+# pip install -r requirements.txt
+
+# AI Model (local via Ollama)
+langchain-ollama==1.0.1
+
+# LangChain core
+langchain==1.2.13
+
+# Multi-agent framework
+crewai==1.11.0
+
+# Ollama support for CrewAI
+litellm==1.82.6
+
+# Web search
+ddgs==9.11.4
+
+# HTTP requests (for Pexels and Facebook API)
+requests
+ 
+# Environment variables (for .env file)
+python-dotenv
+ 
+# HTTP requests (Facebook & Pexels API)
+requests
+ 
+# Environment variables (.env file)
+python-dotenv
+
+# ================================
+# To install:
+# pip install -r requirements.txt
+#
+# To run chatbot:
+# python chat.py
+#
+# To run crew:
+# python crew.py
+# ================================

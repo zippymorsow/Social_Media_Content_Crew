@@ -1,0 +1,13 @@
+# Ignore all .log files
+*.log
+
+# Ignore all .txt files containing token in filename
+*token*.txt
+*Token*.txt
+*TOKEN*.txt
+
+# Ignore all .env files
+*.env
+
+# Ignore all copy files
+*copy*
