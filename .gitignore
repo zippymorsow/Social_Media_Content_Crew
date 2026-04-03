@@ -11,3 +11,6 @@
 
 # Ignore all copy files
 *copy*
+
+# Ignore all file starting from temp_image_
+temp_image_*
