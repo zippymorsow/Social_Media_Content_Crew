@@ -53,6 +53,11 @@ python chat.py
 
 Use `topics.txt` to provide topic ideas for content generation, and review generated output in `logs/`.
 
+## 📱 Social Media Channels
+
+Follow and interact with the crew's managed Facebook page:
+- **Facebook:** [Visit the Page](https://www.facebook.com/profile.php?id=61578545202188)
+
 ## 🧩 Project Structure
 
 - `chat.py`: Prompt/response pipeline, agent routing.
