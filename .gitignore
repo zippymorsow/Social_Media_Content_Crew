@@ -6,11 +6,19 @@
 *Token*.txt
 *TOKEN*.txt
 
-# Ignore all .env files
-*.env
+# Environment variables — NEVER commit this!
+.env
 
-# Ignore all copy files
-*copy*
+# Logs
+logs/*.log
 
-# Ignore all file starting from temp_image_
-temp_image_*
+# Temp images
+temp_image/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Memory files
+chatbot/memory.json
