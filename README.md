@@ -5,12 +5,15 @@
 This project aims to build an agentic social media crew using CREW AI concepts and automation. It is designed to help creators and brands generate, manage, and publish social media content efficiently by leveraging intelligent agents and prompt workflows.
 
 The repository currently includes:
-- `chat.py` - Chat interaction and agent orchestration logic
-- `crew.py` - Crew management and high-level agent coordination
-- `social_crew.py` - Social media content creation and scheduling workflows
-- `topics.txt` / `topics - copy.txt` - Topic seed lists for content generation
+- `agents/` - Individual agent implementations for various tasks
+- `config/` - Configuration settings
+- `crews/` - Crew definitions for multi-agent workflows
+- `data/` - Data files for content generation
 - `logs/` - Runtime logs and status tracking
-- Tokens for FB/Pexels (private) in text files for API integrations
+- `temp_image/` - Temporary image storage
+- `tools/` - Utility tools for integrations
+- `utils/` - Helper utilities
+- `requirements.txt` - Python dependencies
 
 ## 🧠 Goals
 
@@ -35,23 +38,22 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Configure API keys:
-- `FB-token-the AI Content Crew.txt` (Facebook/Meta API key)
-- `pexel token-the AI Content Crew.txt` (Pexels API key)
+4. Configure API keys in `config/settings.py`:
+- Facebook/Meta API key
+- Pexels API key
 
-Ensure those credentials are stored securely and not committed to source control. Exclude text files with "token" in the filename from repository tracking (via `.gitignore`).
+Ensure credentials are stored securely and not committed to source control.
 
 ## ▶️ Usage
 
-Run main scripts as needed:
+Run crew scripts as needed:
 
 ```bash
-python crew.py
-python social_crew.py
-python chat.py
+python crews/social_crew.py
+python crews/affirmation_crew.py
 ```
 
-Use `topics.txt` to provide topic ideas for content generation, and review generated output in `logs/`.
+Use `data/topics.txt` and `data/affirmations.txt` to provide content seeds, and review generated output in `logs/`.
 
 ## 📱 Social Media Channels
 
@@ -60,22 +62,41 @@ Follow and interact with the crew's managed Facebook page:
 
 ## 🧩 Project Structure
 
-- `chat.py`: Prompt/response pipeline, agent routing.
-- `crew.py`: Manager for agent workflows and task assignment.
-- `social_crew.py`: Social media-specific routines (post composition, scheduling).
-- `topics.txt`: Seed topic outlines for posts.
-- `logs/`: Execution logs and audit trail.
+- `agents/`: Individual agent implementations
+  - `hashtag_agent.py`: Handles hashtag generation
+  - `image_agent.py`: Manages image-related tasks
+  - `publisher.py`: Handles publishing to social media
+  - `researcher.py`: Conducts research for content
+  - `writer.py`: Generates written content
+- `config/`: Configuration files
+  - `settings.py`: Application settings and API keys
+- `crews/`: Crew definitions for multi-agent workflows
+  - `affirmation_crew.py`: Crew for affirmation content generation
+  - `social_crew.py`: Crew for social media content creation
+- `data/`: Data files for content generation
+  - `affirmations.txt`: Affirmation content seeds
+  - `topics.txt`: Topic lists for posts
+- `logs/`: Execution logs and audit trail
+- `temp_image/`: Temporary image storage
+- `tools/`: Utility tools for integrations
+  - `affirmation_image.py`: Image tools for affirmations
+  - `facebook.py`: Facebook integration
+  - `image_tool.py`: General image tools
+  - `web_search.py`: Web search functionality
+- `utils/`: Helper utilities
+  - `helpers.py`: Helper functions
+- `requirements.txt`: Python dependencies
 
 ## 🔐 Security
 
-- Do not commit API tokens.
-- Add `.gitignore` entries for token files and `logs/` if needed.
+- Do not commit API tokens in `config/settings.py`.
+- Ensure `.gitignore` excludes sensitive files and `logs/`.
 
 ## ✨ Next Steps
 
-- Add a consolidated settings/config file (e.g., `.env` or `config.json`).
 - Build CLI options for platform target and cadence.
 - Add unit tests for key workflow functions.
+- Expand agent capabilities for additional social media platforms.
 
 ## 📄 License
 

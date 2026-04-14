@@ -5,6 +5,7 @@ and posts to both Facebook Story (MyDay) and Feed.
 """
 
 import os
+from dotenv import load_dotenv
 import time
 from crewai import Task, Crew, Process
 from agents.writer import create_affirmation_writer
@@ -18,6 +19,14 @@ from utils.helpers import (
     log_crew_done,
     wait_between_items
 )
+
+# Force load .env from project root
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
+
+print(f"Loading .env from: {BASE_DIR}")
+print(f"Page ID loaded: {os.getenv('FACEBOOK_PAGE_ID')}")
+print(f"Token loaded: {'YES' if os.getenv('FACEBOOK_PAGE_TOKEN') else 'NO'}")
 
 logger = setup_logger("affirmation_crew")
 

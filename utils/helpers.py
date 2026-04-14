@@ -205,7 +205,7 @@ def log_crew_done(logger_ref, index: int, total: int, item: str, elapsed: float)
     print(f"\n✅ Done! '{item}' completed in {elapsed} seconds\n")
 
 
-def wait_between_items(logger_ref, seconds: int = 5):
+def wait_between_items(logger_ref, seconds: int = 30):
     """Wait between crew runs to avoid rate limits."""
     log_step(logger_ref, "SYSTEM", "DELAY", f"Waiting {seconds} seconds before next item...")
     time.sleep(seconds)

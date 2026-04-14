@@ -5,7 +5,11 @@ from dotenv import load_dotenv
 from crewai import LLM
 
 # --- Load .env ---
-load_dotenv()
+# load_dotenv()
+# TO — always find .env relative to this file's location
+from pathlib import Path
+BASE_DIR = Path(__file__).parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 # --- Facebook ---
 FACEBOOK_PAGE_TOKEN = os.getenv("FACEBOOK_PAGE_TOKEN")
