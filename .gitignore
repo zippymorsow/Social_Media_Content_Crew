@@ -22,3 +22,4 @@ __pycache__/
 
 # Memory files
 chatbot/memory.json
+.env.local

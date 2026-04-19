@@ -7,26 +7,28 @@ and posts to both Facebook Story (MyDay) and Feed.
 import os
 from dotenv import load_dotenv
 import time
+import atexit
 from crewai import Task, Crew, Process
 from agents.writer import create_affirmation_writer
 from agents.publisher import create_affirmation_publisher
 from tools.affirmation_image import create_affirmation_image
 from config.settings import DATA_DIR, setup_logger, log_step
+import config.settings as settings
 from utils.helpers import (
     read_lines_from_file,
     validate_image_file,
     log_crew_start,
     log_crew_done,
-    wait_between_items
+    wait_between_items,
+    cleanup_crew_threads,
+    cleanup_all_threads
 )
 
 # Force load .env from project root
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
-print(f"Loading .env from: {BASE_DIR}")
-print(f"Page ID loaded: {os.getenv('FACEBOOK_PAGE_ID')}")
-print(f"Token loaded: {'YES' if os.getenv('FACEBOOK_PAGE_TOKEN') else 'NO'}")
+settings.CURRENT_CREW = "affirmation_crew"
 
 logger = setup_logger("affirmation_crew")
 
@@ -49,6 +51,7 @@ def run():
 
     # --- Process each affirmation ---
     for index, affirmation in enumerate(affirmations, start=1):
+        start_time = time.time()
         log_crew_start(logger, index, len(affirmations), affirmation)
 
         # --- Step 1: Expand affirmation with AI ---
@@ -76,7 +79,11 @@ def run():
         )
 
         log_step(logger, "SYSTEM", f"AFFIRMATION {index}", "Writing expanded affirmation...")
-        writing_result = writing_crew.kickoff()
+        try:
+            writing_result = writing_crew.kickoff()
+        finally:
+            cleanup_crew_threads(writing_crew, logger)
+        
         expanded_text = str(writing_result).strip()
         log_step(logger, "AFFIRMATION_WRITER", "STEP:1", f"Expanded: {expanded_text[:80]}...")
 
@@ -113,8 +120,11 @@ def run():
             verbose=True
         )
 
-        start_time = time.time()
-        publishing_crew.kickoff()
+        try:
+            publishing_crew.kickoff()
+        finally:
+            cleanup_crew_threads(publishing_crew, logger)
+        
         elapsed = round(time.time() - start_time, 2)
 
         log_crew_done(logger, index, len(affirmations), affirmation, elapsed)
@@ -124,6 +134,10 @@ def run():
 
     log_step(logger, "SYSTEM", "FINISHED", "All affirmations processed!")
     print("\n🌟 All affirmations posted to MyDay and Feed!")
+
+
+# Register cleanup on exit
+atexit.register(cleanup_all_threads)
 
 
 if __name__ == "__main__":

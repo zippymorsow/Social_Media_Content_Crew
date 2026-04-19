@@ -9,6 +9,7 @@ import time
 import requests
 from crewai.tools import BaseTool
 from config.settings import FACEBOOK_PAGE_ID, FACEBOOK_PAGE_TOKEN, setup_logger, log_step
+from tools.image_tool import ImageTool
 from utils.helpers import (
     clean_caption,
     validate_image_file,
@@ -34,7 +35,6 @@ class FacebookPostTool(BaseTool):
 
     def _retry_image(self, topic: str) -> str:
         """Retry ImageTool up to 3 times if temp file is missing."""
-        from tools.image_tool import ImageTool
         image_tool = ImageTool()
         for retry in range(1, 4):
             log_step(logger, "PUBLISHER", "TOOL:Facebook", f"Image retry {retry}/3...")
@@ -132,8 +132,8 @@ class FacebookAffirmationTool(BaseTool):
             results.append(handle_facebook_result(story_result, "Story/MyDay", logger))
 
             # --- Post to Feed ---
-            feed_result = post_image_to_feed(temp_path, caption)
-            results.append(handle_facebook_result(feed_result, "Feed", logger))
+            # feed_result = post_image_to_feed(temp_path, caption)
+            # results.append(handle_facebook_result(feed_result, "Feed", logger))
 
             # --- Cleanup ---
             cleanup_temp_file(temp_path)

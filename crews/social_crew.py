@@ -4,32 +4,48 @@ Researches topics and posts engaging content to Facebook Feed.
 """
 
 import os
+import re
 import time
+import atexit
 from crewai import Task, Crew, Process
 from agents.researcher import create_researcher
 from agents.writer import create_writer
 from agents.hashtag_agent import create_hashtag_agent
-from agents.image_agent import create_image_agent
-from agents.publisher import create_publisher
 from tools.facebook import FacebookPostTool
+from tools.image_tool import ImageTool
 from config.settings import DATA_DIR, setup_logger, log_step
-from utils.helpers import read_lines_from_file, log_crew_start, log_crew_done, wait_between_items
+import config.settings as settings
+from utils.helpers import (
+    read_lines_from_file,
+    log_crew_start,
+    log_crew_done,
+    wait_between_items,
+    cleanup_crew_threads,
+    cleanup_all_threads
+)
+
+settings.CURRENT_CREW = "social_crew"
 
 logger = setup_logger("social_crew")
+
+
+def extract_temp_image_path(text: str) -> str:
+    """
+    Pull the TEMP_IMAGE_PATH value out of the image agent's raw output.
+    Handles cases where the agent wraps it in extra text.
+    """
+    # Match TEMP_IMAGE_PATH:/some/path/file.jpg  (greedy to end of word)
+    match = re.search(r'TEMP_IMAGE_PATH:\S+', text)
+    if match:
+        return match.group(0).strip()
+    return None
 
 
 def run():
     log_step(logger, "SYSTEM", "STARTUP", "Initializing Social Media Crew...")
 
-    # --- Initialize tools and agents ---
+    # --- Initialize Facebook tool ---
     facebook_tool = FacebookPostTool()
-    researcher    = create_researcher()
-    writer        = create_writer()
-    hashtag_agent = create_hashtag_agent()
-    image_agent   = create_image_agent()
-    poster        = create_publisher(facebook_tool)
-
-    log_step(logger, "SYSTEM", "STARTUP", "All 5 agents ready!")
 
     # --- Read topics ---
     topics = read_lines_from_file(os.path.join(DATA_DIR, "topics.txt"))
@@ -40,9 +56,18 @@ def run():
     log_step(logger, "SYSTEM", "STARTUP", f"Found {len(topics)} topic(s)")
 
     # --- Process each topic ---
+    overall_start_time = time.time()
     for index, topic in enumerate(topics, start=1):
+        start_time = time.time()
         log_crew_start(logger, index, len(topics), topic)
+
+        # Recreate agents fresh each iteration to avoid stale state
         facebook_tool.current_topic = topic
+        researcher    = create_researcher()
+        writer        = create_writer()
+        hashtag_agent = create_hashtag_agent()
+
+        log_step(logger, "SYSTEM", "STARTUP", "All 4 agents ready!")
 
         research_task = Task(
             description=f"""Research this topic and find the most surprising, fascinating, 
@@ -80,48 +105,56 @@ def run():
             callback=lambda output: log_step(logger, "HASHTAG_SPECIALIST", "STEP:3 DONE", "Hashtags added ✅")
         )
 
-        image_task = Task(
-            description=f"""Search for the most visually stunning image for: {topic}
-            Return the TEMP_IMAGE_PATH value exactly as returned by the tool.""",
-            expected_output="A TEMP_IMAGE_PATH value pointing to the downloaded image.",
-            agent=image_agent,
-            callback=lambda output: log_step(logger, "IMAGE_CURATOR", "STEP:4 DONE", "Image found ✅")
-        )
-
-        posting_task = Task(
-            description=f"""You have results from previous agents:
-            1. IMAGE PATH from Image Curator (starts with TEMP_IMAGE_PATH:)
-            2. POST CAPTION from Hashtag Specialist
-
-            Call the Facebook Post tool ONCE with this EXACT format:
-            [ACTUAL TEMP_IMAGE_PATH VALUE]|||[ACTUAL POST CAPTION]
-
-            CRITICAL: Call the tool ONLY ONCE. Use the ACTUAL path — not placeholder text.""",
-            expected_output="Confirmation the post was published with Post ID.",
-            agent=poster,
-            callback=lambda output: log_step(logger, "PUBLISHER", "STEP:5 DONE", "Published ✅")
-        )
-
         crew = Crew(
-            agents=[researcher, writer, hashtag_agent, image_agent, poster],
-            tasks=[research_task, writing_task, hashtag_task, image_task, posting_task],
+            agents=[researcher, writer, hashtag_agent],
+            tasks=[research_task, writing_task, hashtag_task],
             process=Process.sequential,
             verbose=True
         )
 
-        start_time = time.time()
-        crew.kickoff()
-        elapsed = round(time.time() - start_time, 2)
+        try:
+            crew.kickoff()
+        finally:
+            cleanup_crew_threads(crew, logger)
 
+        
+        # ----------------------------------------------------------------
+        # STEP 5: Publish directly in Python
+        # ----------------------------------------------------------------
+        log_step(logger, "PUBLISHER", "STEP:5 START", "Publishing to Facebook...")
+
+        caption_raw = hashtag_task.output.raw.strip()
+
+        # Get image directly from ImageTool — don't trust the LLM to relay the path
+        image_tool = ImageTool()
+        image_ref = image_tool._run(topic).strip()  # returns "TEMP_IMAGE_PATH:/path/to/img.jpg"
+
+        if not image_ref.startswith("TEMP_IMAGE_PATH:"):
+            log_step(logger, "PUBLISHER", "STEP:5 WARN", f"⚠️ ImageTool returned unexpected: {image_ref}")
+            image_ref = "NO_IMAGE"
+
+        # Pass directly into FacebookPostTool — it handles retry, upload, cleanup
+        tool_input = f"{image_ref}|||{caption_raw}"
+        post_result = facebook_tool._run(tool_input)
+        log_step(logger, "PUBLISHER", "STEP:5 DONE", f"Result: {post_result}")
+        print(f"\n📣 Facebook result: {post_result}\n")
+
+        # ----------------------------------------------------------------
+
+        elapsed = round(time.time() - start_time, 2)
         log_crew_done(logger, index, len(topics), topic, elapsed)
 
         if index < len(topics):
             wait_between_items(logger)
 
-    log_step(logger, "SYSTEM", "FINISHED", "All topics processed!")
-    print("\n🎉 All topics processed and posted!")
+    overall_elapsed = round(time.time() - overall_start_time, 2)
+    log_step(logger, "SYSTEM", "FINISHED", f"All topics processed! Total duration: {overall_elapsed} seconds")
+    print(f"\n🎉 All topics processed and posted in {overall_elapsed} seconds!")
 
- 
+
+# Register cleanup on exit
+atexit.register(cleanup_all_threads)
+
 
 if __name__ == "__main__":
     run()

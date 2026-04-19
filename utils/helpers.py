@@ -168,9 +168,14 @@ def post_image_to_story(temp_path: str) -> dict:
     log_step(logger, "FACEBOOK", "STORY", f"Posting image to story: {temp_path}")
     with open(temp_path, "rb") as img_file:
         response = requests.post(
-            f"https://graph.facebook.com/v19.0/{FACEBOOK_PAGE_ID}/photo_stories",
+            f"https://graph.facebook.com/v19.0/{FACEBOOK_PAGE_ID}/stories",
             params={"access_token": FACEBOOK_PAGE_TOKEN},
-            files={"source": ("image.jpg", img_file, "image/jpeg")}
+            files={"source": ("image.jpg", img_file, "image/jpeg")},
+            data={"media_type": "IMAGE"}
+
+            # f"https://graph.facebook.com/v19.0/{FACEBOOK_PAGE_ID}/photo_stories",
+            # params={"access_token": FACEBOOK_PAGE_TOKEN},
+            # files={"source": ("image.jpg", img_file, "image/jpeg")}
         )
     return response.json()
 
@@ -209,3 +214,37 @@ def wait_between_items(logger_ref, seconds: int = 30):
     """Wait between crew runs to avoid rate limits."""
     log_step(logger_ref, "SYSTEM", "DELAY", f"Waiting {seconds} seconds before next item...")
     time.sleep(seconds)
+
+
+# ============================================================
+# THREAD CLEANUP UTILITIES
+# ============================================================
+
+def cleanup_crew_threads(crew, logger_ref):
+    """
+    Properly clean up thread pools created by CrewAI.
+    Call this after each crew.kickoff() execution.
+    """
+    try:
+        # Stop any active executor threads
+        for agent in crew.agents:
+            if hasattr(agent, '_executor') and agent._executor:
+                agent._executor.shutdown(wait=False)
+        
+        # Stop the manager's executor if it exists
+        if hasattr(crew, '_manager') and hasattr(crew._manager, '_executor'):
+            crew._manager._executor.shutdown(wait=False)
+    except Exception as e:
+        log_step(logger_ref, "CLEANUP", "THREADS", f"Debug: {e}")
+
+
+def cleanup_all_threads():
+    """
+    Emergency cleanup for any remaining daemon threads at exit.
+    Automatically registered to run on program exit.
+    """
+    try:
+        # Give daemon threads a brief moment to finish
+        time.sleep(0.1)
+    except Exception:
+        pass

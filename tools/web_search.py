@@ -6,7 +6,7 @@ logger = setup_logger("web_search")
 
 class WebSearchTool(BaseTool):
     name: str = "Web Search"
-    description: str = "Search the web for current information about a topic."
+    description: str = "Search the web for current and relevant information about a topic."
 
     def _run(self, query: str) -> str:
         log_step(logger, "RESEARCHER", "TOOL:WebSearch", f"Searching: {query}")

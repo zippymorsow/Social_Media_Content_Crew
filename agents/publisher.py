@@ -11,7 +11,9 @@ def create_publisher(facebook_tool: FacebookPostTool) -> Agent:
         always using the exact format required. You call the tool ONLY ONCE.""",
         tools=[facebook_tool],
         llm=MODEL,
-        verbose=True
+        verbose=True,
+        allow_delegation=False,     # ✅ prevents agent from passing off to another agent
+        max_iter=3                  # ✅ prevents infinite reasoning loops
     )
 
 def create_affirmation_publisher() -> Agent:

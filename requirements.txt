@@ -12,12 +12,17 @@ langchain==1.2.13
 
 # Multi-agent framework
 crewai==1.11.0
+crewai-tools==0.47.1
 
 # Ollama support for CrewAI
 litellm==1.82.6
 
 # Web search
 ddgs==9.11.4
+
+# --- Web API wrapper ---
+fastapi==0.115.6
+uvicorn==0.34.0
 
 # Creates the beautiful affirmation images with text
 pillow
@@ -28,12 +33,7 @@ requests
 # Environment variables (for .env file)
 python-dotenv
  
-# HTTP requests (Facebook & Pexels API)
-requests
  
-# Environment variables (.env file)
-python-dotenv
-
 # ================================
 # To install:
 # pip install -r requirements.txt
