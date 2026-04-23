@@ -49,15 +49,17 @@ Ensure credentials are stored securely and not committed to source control.
 Generate engaging social media content and post to Facebook Feed.
 
 **How to use:**
-1. Add topics to `data/topics.txt` (one topic per line)
+1. Optionally add topics to `data/topics.txt` (one topic per line). If empty, the ideator agent will generate mystical, uplifting topics automatically.
 2. Run the crew:
    ```bash
    python crews/social_crew.py
    ```
 3. The crew will:
+   - **Ideate** (if needed): Generate a mystical topic inspired by themes like Magical Thoughts, Cosmic Whimsy, Joyful Inspirations, Daily Magic/Miracles, Psychic, Astrology, Divination, Meditation, Chakras, or Spiritual Healing.
    - **Research** each topic and gather fascinating facts
    - **Write** a vibrant, energetic Facebook post (100-150 words)
    - **Generate hashtags** (8-10) and categorize the post
+   - **Create** a relevant image using Pexels or Unsplash
    - **Post** to your Facebook Feed
 
 **Output:** Check `logs/` for execution details and verify posts on your Facebook page.
@@ -87,6 +89,7 @@ Follow and interact with the crew's managed Facebook page:
 
 - `agents/`: Individual agent implementations
   - `hashtag_agent.py`: Handles hashtag generation
+  - `ideator.py`: Generates mystical topic ideas for content inspiration
   - `image_agent.py`: Manages image-related tasks
   - `publisher.py`: Handles publishing to social media
   - `researcher.py`: Conducts research for content
@@ -98,7 +101,7 @@ Follow and interact with the crew's managed Facebook page:
   - `social_crew.py`: Crew for social media content creation
 - `data/`: Data files for content generation
   - `affirmations.txt`: Affirmation content seeds
-  - `topics.txt`: Topic lists for posts
+  - `topics.txt`: Optional topic lists for posts (if empty, ideator generates topics)
 - `logs/`: Execution logs and audit trail
 - `temp_image/`: Temporary image storage
 - `tools/`: Utility tools for integrations
