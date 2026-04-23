@@ -14,6 +14,9 @@ load_dotenv(BASE_DIR / ".env")
 # --- Facebook ---
 FACEBOOK_PAGE_TOKEN = os.getenv("FACEBOOK_PAGE_TOKEN")
 FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID")
+FACEBOOK_PAGE_URL = os.getenv("FACEBOOK_PAGE_URL")
+FACEBOOK_APP_ID = os.getenv("FACEBOOK_APP_ID")
+FACEBOOK_APP_SECRET = os.getenv("FACEBOOK_APP_SECRET")
 
 # --- Pexels ---
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
