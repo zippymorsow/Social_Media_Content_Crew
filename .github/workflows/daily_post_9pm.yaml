@@ -1,4 +1,4 @@
-name: Daily Facebook Feed Post
+name: 9AM Daily Facebook Feed Post
 
 on:
   schedule:
