@@ -45,15 +45,38 @@ pip install -r requirements.txt
 Ensure credentials are stored securely and not committed to source control.
 
 ## ▶️ Usage
+### Social Crew
+Generate engaging social media content and post to Facebook Feed.
 
-Run crew scripts as needed:
+**How to use:**
+1. Add topics to `data/topics.txt` (one topic per line)
+2. Run the crew:
+   ```bash
+   python crews/social_crew.py
+   ```
+3. The crew will:
+   - **Research** each topic and gather fascinating facts
+   - **Write** a vibrant, energetic Facebook post (100-150 words)
+   - **Generate hashtags** (8-10) and categorize the post
+   - **Post** to your Facebook Feed
 
-```bash
-python crews/social_crew.py
-python crews/affirmation_crew.py
-```
+**Output:** Check `logs/` for execution details and verify posts on your Facebook page.
 
-Use `data/topics.txt` and `data/affirmations.txt` to provide content seeds, and review generated output in `logs/`.
+### Affirmation Crew
+Create warm, uplifting affirmation content with custom images and post to Facebook Stories & Feed.
+
+**How to use:**
+1. Add affirmations to `data/affirmations.txt` (one affirmation per line)
+2. Run the crew:
+   ```bash
+   python crews/affirmation_crew.py
+   ```
+3. The crew will:
+   - **Write** an expanded, warm affirmation message (2-3 sentences)
+   - **Create** a visually appealing image with Pillow
+   - **Publish** to both Facebook Story (MyDay) and Feed
+
+**Output:** Check `logs/` for execution details and see posts on your Facebook page.
 
 ## 📱 Social Media Channels
 
