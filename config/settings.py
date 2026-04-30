@@ -2,7 +2,7 @@ import os
 import logging
 import time
 from dotenv import load_dotenv
-from crewai import LLM
+from crewai import Agent, LLM
 
 # --- Load .env ---
 # load_dotenv()
@@ -23,7 +23,10 @@ PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
 
 # --- Ollama Model ---
 MODEL = LLM(model="ollama/llama3.2:3b", base_url="http://localhost:11434")
-# MODEL = LLM(model="ollama/gemma3:1b", base_url="http://localhost:11434")
+# MODEL = LLM(
+#     model="claude-sonnet-4-20250514",
+#     api_key=os.getenv("ANTHROPIC_API_KEY")
+# )
 
 # --- Paths ---
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
